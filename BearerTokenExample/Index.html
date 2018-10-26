@@ -1,0 +1,53 @@
+﻿<script src="Scripts/jquery-3.3.1.min.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    Username  <input type="text" id="txtUsername"  /> 
+    Password <input type="password" id="txtPass" />
+    
+    <button id="btnGiris" onclick="Giris();" >Giris</button> <br/>
+    <br/>
+    <button id="btnListele" onclick="Listele();" >Listele</button>
+    <ul id="list">
+
+    </ul>
+</body>
+</html>
+<script>
+    function Giris() {
+        var name = $("#txtUsername").val();
+        var pass = $("#txtPass").val();
+        var loginObject = {
+            username: name,
+            password: pass,
+            grant_type:'password'
+        }
+        $.post("http://localhost:57953/getToken", loginObject, function (result) {
+            sessionStorage.setItem("MyToken", result.access_token);
+            alert("Giriş Başarıldıır");
+        });
+    }
+
+    function Listele() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "http://localhost:57953/api/Product",
+            headers: { Authorization: "Bearer " + sessionStorage.getItem("MyToken") },
+            success: function (response) {
+                for (var i = 0; i < response.length; i++) {
+                    var data = response[i];
+                    $("#list").append("<li> " + data + " </li>");
+                }
+            },
+            error: function (error) {
+                alert(error.status + " " + error.statusText);
+            }
+        });
+    }
+
+</script>
